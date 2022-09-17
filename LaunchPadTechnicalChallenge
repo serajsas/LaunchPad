@@ -1,0 +1,34 @@
+Backend Prompt: 
+
+You are a business owner at Launch-Pizza. One day you decide to open your store to online purchases. The basic functionality must allow any customer to order a pizza from a set menu, track the order status of the pizza, and be able to see a receipt for their order for up to one year. Describe and give examples of a basic API and its endpoints that will accomplish this task. You do not need to extensively document this API.
+
+1.	Assumptions: 
+    a.	A customer needs to at least have an account so we can verify the order and charge the customer, otherwise it will be very difficult to eliminate fake orders.
+    b.	A customer may make zero or many orders, after order is confirmed and placed, a customer will have a receipt for that order that they can see. This will allow customers to see certain purchases during specific dates. 
+    c.	The menu contains only pizza options. 
+2.	DB design: 
+      a.	Customer:
+        i.	A customer has 0 or many receipts. (1-to-many relationship with receipt entity)
+        ii.	A customer has a phone number, username, password and a verified flag to make sure that this customer is allowed to make orders. If number is not verified, customer needs to verify their number first
+      b.	Receipt: 
+        i.	A Receipt contains a unique ID
+        ii.	A Receipt contains the pizzas ordered and the price for each one
+        iii.	A Receipt contains the total sum of the price of the order 
+        iv.	A Receipt contains the date of the order
+        v.	A Receipt contains reference to only one customer
+        vi.	A Receipt contains a timestamp
+      c.	Pizza: 
+        i.	A Pizza entity contains ingredients
+        ii.	A Pizza entity contains Price 
+      3.	API endpoints: 
+        a.	Pizza Endpoints: These endpoints do not require authentication, will consider them to be public as they retrieve general details. 
+            i.	Host/pizza/?name=String     Get Pizza given the pizza name. Pizza object should include pizza name, the ingredients, and the price of the pizza. 
+            ii.	Host/pizza/all   Get a list of Objects where each object should include pizza name, the ingredients, and the price of the pizza. 
+        b.	Order endpoints: These endpoints require authentication. With the request headers we can have a way to verify the user, could be by a token or by providing username and password. 
+            i.	Host/order/  Post request to place an order. The Request must contain the pizzas the user wants to order. This could also specify any extra information or notes to the store, such as the quantity, different types of pizzas, and crust level and so on. 
+            ii.	Host/order/  Get request to return all the receipts for the customer under one year from the order date.
+            iii.	Host/order/:receipt-id  Get request to return the receipt for a specific order that is ordered within one year.
+
+Comments:
+    1.	We could also provide endpoints for user and user verification. There could be multiple ways to allow the user to fetch orders for up to one year. We could set an expiry date on the receipt, and it will be deleted immediately when the one-year span finishes for that order. We could also allow the receipt to persist in the database but that would mean we have to calculate the date manually to check if this order is made within a year.  
+    2.	We could also have private endpoints that are not exposed to the client such as Host/pizza/?name=String where it creates a new pizza in the database and make it available for customers to see.
